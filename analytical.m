@@ -43,3 +43,34 @@ disp(['Result 2: ', num2str(result2)]);
 
 tf_eq_bb = [Kt / (La * Jm)];
 ch_eq_coefs2 = [1, (Ra * Jm + Bm * La) / (La * Jm), (Kt * Ke + Ra * Bm) / (La * Jm)];
+
+%% Lead Compensator
+
+close all
+
+wd = 80;
+z = -90;
+p1 = poles(1);
+p2 = poles(2);
+
+p = p1 - (wd/(   tan(   -atan((p2-p1)/wd) + atan(wd/(p1 - z))  )));
+
+zero_tf = tf([1, -z], 1);  % Transfer function for zero: (s - z)
+pole_tf = tf(1, [1, -p]);  % Transfer function for pole: 1/(s - p)
+
+% Combine the existing transfer function with the new zero and pole
+new_sys = series(sys, zero_tf);
+new_sys = series(new_sys, pole_tf);
+
+
+% Plot the root locus of the new system
+figure;
+rlocus(new_sys);
+title('Root Locus Plot for Lead Compensation');
+grid on;
+g
+atan((p2-p1)/wd) + atan(wd/(p1 - p)) - atan(wd/(p1 - z))
+
+
+
+
