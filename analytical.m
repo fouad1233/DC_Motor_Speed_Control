@@ -68,9 +68,26 @@ figure;
 rlocus(new_sys);
 title('Root Locus Plot for Lead Compensation');
 grid on;
-g
 atan((p2-p1)/wd) + atan(wd/(p1 - p)) - atan(wd/(p1 - z))
 
 
+%% Lag Compensator
 
+close all
+
+p = -100;
+z = p1 + p - p2;
+
+zero_tf_lag = tf([1, -z], 1);  % Transfer function for zero: (s - z)
+pole_tf_lag = tf(1, [1, -p]);  % Transfer function for pole: 1/(s - p)
+
+% Combine the existing transfer function with the new zero and pole
+new_sys_lag = series(sys, zero_tf_lag);
+new_sys_lag = series(new_sys_lag, pole_tf_lag);
+
+% Plot the root locus of the new system with lag compensator
+figure;
+rlocus(new_sys_lag);
+title('Root Locus Plot for Lag Compensation');
+grid on;
 
