@@ -49,45 +49,58 @@ ch_eq_coefs2 = [1, (Ra * Jm + Bm * La) / (La * Jm), (Kt * Ke + Ra * Bm) / (La * 
 close all
 
 wd = 80;
-z = -90;
+z_lead = -90;
 p1 = poles(1);
 p2 = poles(2);
 
-p = p1 - (wd/(   tan(   -atan((p2-p1)/wd) + atan(wd/(p1 - z))  )));
+p_lead = p1 - (wd/(   tan(   -atan((p2-p1)/wd) + atan(wd/(p1 - z_lead))  )));
 
-zero_tf = tf([1, -z], 1);  % Transfer function for zero: (s - z)
-pole_tf = tf(1, [1, -p]);  % Transfer function for pole: 1/(s - p)
+lead_tf = tf([1, -z_lead], [1, -p_lead]);  % Transfer function: (s - z)/(s - p)
 
 % Combine the existing transfer function with the new zero and pole
-new_sys = series(sys, zero_tf);
-new_sys = series(new_sys, pole_tf);
-
+lead_sys = series(sys, lead_tf);
 
 % Plot the root locus of the new system
 figure;
-rlocus(new_sys);
+rlocus(lead_sys);
 title('Root Locus Plot for Lead Compensation');
 grid on;
-atan((p2-p1)/wd) + atan(wd/(p1 - p)) - atan(wd/(p1 - z))
+atan((p2-p1)/wd) + atan(wd/(p1 - p_lead)) - atan(wd/(p1 - z_lead))
 
 
 %% Lag Compensator
 
 close all
 
-p = -100;
-z = p1 + p - p2;
+p_lag = -100;
+z_lag = p1 + p_lag - p2;
 
-zero_tf_lag = tf([1, -z], 1);  % Transfer function for zero: (s - z)
-pole_tf_lag = tf(1, [1, -p]);  % Transfer function for pole: 1/(s - p)
+lag_tf = tf([1, -z_lag], [1, -p_lag]);  % Transfer function: (s - z)/(s - p)
 
 % Combine the existing transfer function with the new zero and pole
-new_sys_lag = series(sys, zero_tf_lag);
-new_sys_lag = series(new_sys_lag, pole_tf_lag);
+lag_sys = series(sys, lag_tf);
 
 % Plot the root locus of the new system with lag compensator
 figure;
-rlocus(new_sys_lag);
+rlocus(lag_sys);
 title('Root Locus Plot for Lag Compensation');
 grid on;
 
+%% Lead Lag Compensator
+
+z_lead = -90;
+p_lead = -190;
+z_lag = -182.9482;
+p_lag = -150;
+
+lead_tf = tf([1, -z_lead], [1, -p_lead]);  % Transfer function: (s - z)/(s - p)
+lag_tf  = tf([1, -z_lag],  [1, -p_lag]);   % Transfer function: (s - z)/(s - p)
+
+lead_lag_sys = series(sys, lag_tf);
+lead_lag_sys = series(lead_lag_sys, lead_tf);
+
+% Plot the root locus of the new system with lead-lag compensator
+figure;
+rlocus(lead_lag_sys);
+title('Root Locus Plot for Lead-Lag Compensation');
+grid on;
